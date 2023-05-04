@@ -1,12 +1,11 @@
 // 운동추천 자식 컴포넌트
+import {request} from "../../utils/request"
 import axios from "axios";
 import { useState, useEffect } from "react";
 
 // props.gender 구조분해할당
 const TrainingRecommend = ({ gender, age, height, weight }) => {
   const [activated, setActivated] = useState(false); // 로딩 버튼
-  // pages/training/recommend에서 받아온 prop값인 gender : 정상적으로 받아오는 것 확인
-  // 원랜 gender = props.gender, props.status처럼 받아와야 하지만 겍체 구조 분해 할당을 통해 위처럼 받아옴
   const [res, setRes] = useState({
     // 입력값 변수
     flag: 1,
@@ -18,21 +17,9 @@ const TrainingRecommend = ({ gender, age, height, weight }) => {
   const [data, setData] = useState(""); // chatGPT 응답값 변수
   // const [plan, setPlan] = useState(""); // Json형태로 반환된 운동계획
   
-
   useEffect(() => {
     setRes((prevState) => ({ ...prevState, gender: gender, age: age, height: height, weight: weight }));
   }, [gender, age, height, weight]); // 성별, 스테이터스가 props로 넘어올때마다(props.gender가 변동 있을때 마다)
-
-  // useEffect(() => {
-  //   console.log("데이터확인:", [JSON.stringify(data)]); // JSON 객체 확인
-  // }, [data]); // 데이터 반영되는지 확인
-
-  // let test = {}; // JSON 객체 담기
-  // useEffect(() => {
-  //   console.log("플랜확인:", [JSON.stringify(plan)]); // JSON 객체 확인
-  //   test = JSON.stringify(plan).replace(/\\n|\\s/g, '').replace(/\\/g, ''); // 첫 번째 replace 메서드는 \n과 공백을 제거하고, 두 번째 replace 메서드는 \ 문자를 제거
-  //   console.log(test)
-  // }, [plan]); // 플랜값 반영되는지 확인
 
   const onClickSubmitButton = (e) => {// 입력버튼 누르면
     e.preventDefault();
@@ -55,13 +42,11 @@ const TrainingRecommend = ({ gender, age, height, weight }) => {
         // console.log("log:res.data",JSON.stringify(res.data));
         // console.log("log:res.data.response",JSON.stringify(res.data.response.text.replace(/^\n+/, "")));
         const planText = res.data.response.text.replace(/^\n+/, ""); // chat.ts에서 응답받은 요청값을 plan에 셋팅, 문장 맨 앞 줄바꿈 제거
-        const planJSON = JSON.stringify(JSON.parse(planText));
-        // const planJSON = JSON.stringify(planText).replace(/\\n|\\s/g, "").replace(/\\/g, "");
+        // planText 값을 JSON.parse() 메소드를 사용하여 JSON 객체로 변환한 후, JSON.stringify() 메소드를 사용하여 다시 JSON 문자열로 변환하면, 사이 사이의 공백이 없는 JSON 문자열을 얻을 수 있다
+        const planJSON = JSON.stringify(JSON.parse(planText)); 
         console.log('planJSON',planJSON);
-        // setPlan(planText); // 위에서 문자열로 바꿔두면, 원시데이터이므로 바로 useState에 반영 // 이제보니 필요한가 싶기도.
-
         // 위 코드에서 변환된 JSON 객체를 서버로 전송하는 부분을 추가
-        axios
+        request()
           .post("/planner/exercise", { plan: planJSON })
           .then((res) => {console.log("Plan sent to server:", res.data);}).catch((err) => {
           console.error(err);

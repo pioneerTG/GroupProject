@@ -2,13 +2,6 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { Configuration, OpenAIApi } from "openai";
 
 export default async function chat(req: NextApiRequest, res: NextApiResponse) {
-  // let flag
-  // if(req.body.prompt.flag === 0 || req.body.prompt.flag === 1 ){ // 운동 추천, 식단 추천일때
-  //   flag = req.body.prompt.flag 
-  // }else { // 운동 추천 안의 계획 반영일때
-  //   console.log("운동 추천도, 식단 추천도 아닌 계획 반영")
-  //   flag = req.body.flag
-  // } 
   const {flag} = req.body.prompt;
   if (!flag) {
     // 식단 추천
@@ -42,20 +35,6 @@ export default async function chat(req: NextApiRequest, res: NextApiResponse) {
         presence_penalty: 0.4, // 모델이 이전 대화에서 나타나지 않았던 단어를 더 자주 사용하도록 유도하는 속성. 이 값을 높일수록 이전 대화에서 나타나지 않은 단어가 모델 출력에서 더욱 자주 나타남.
       });
       res.status(200).json({ response: response.data.choices[0] }); // HTTP 응답 상태 코드 반환(상태코드와 함께 전송), 200은 ok를 나타냄.
-      // } else if (buttonInput === "button2") {
-      //   // let promptText = menus+'에 대한 각각의 조리방법을 알려주세요. 중복된 메뉴가 있으면 한번만 대답해주세요. 과일과 밥, 김치류에 대한 레시피는 대답하지 마세요. 출력할 대답은 `음식명 : 조리방법` 식으로 대답해주세요.'
-      //   let promptText = menus + "에 대한 각각의 조리방법을 알려주세요. 과일과 밥, 김치류에 대한 레시피는 대답하지 마세요.";
-      //   const response = await openai.createCompletion({
-      //     model: "text-davinci-003",
-      //     prompt: promptText,
-      //     temperature: 0.1,
-      //     max_tokens: 2048,
-      //     top_p: 0.1,
-      //     // frequency_penalty: 0.2,
-      //     // presence_penalty: 0.4,
-      //   });
-      //   res.status(200).json({ response: response.data.choices[0] });
-      // }
     } catch (error) {
       console.error(error);
       return res.status(500).json({ error: error.message });
