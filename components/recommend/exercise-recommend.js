@@ -48,9 +48,7 @@ const TrainingRecommend = ({ gender, age, height, weight }) => {
       const newRes = { ...res, buttonType: 1}
       setRes(newRes)
       axios.post("/api/chat", { prompt: newRes, data: data}).then((res) => {
-        const planText = res.data.response.replace(/^\n+/, ""); // chat.ts에서 응답받은 요청값을 plan에 셋팅, 문장 맨 앞 줄바꿈 제거
-        // planText 값을 JSON.parse() 메소드를 사용하여 JSON 객체로 변환한 후, JSON.stringify() 메소드를 사용하여 다시 JSON 문자열로 변환하면, 사이 사이의 공백이 없는 JSON 문자열을 얻을 수 있다
-        const planJSON = JSON.stringify(JSON.parse(planText)); 
+        const planJSON = JSON.parse(res.data.response.replace(/^\n+/, "")); // chat.ts에서 응답받은 요청값을 plan에 셋팅, 문장 맨 앞 줄바꿈 제거
         console.log('planJSON',planJSON);
         // 위 코드에서 변환된 JSON 객체를 서버로 전송하는 부분을 추가
         request()
