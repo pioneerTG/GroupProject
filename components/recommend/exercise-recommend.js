@@ -16,49 +16,46 @@ const TrainingRecommend = ({ gender, age, height, weight }) => {
     dateString:"",
   });
   const [data, setData] = useState(""); // chatGPT 응답값 변수
-  // const [plan, setPlan] = useState(""); // Json형태로 반환된 운동계획
   
   useEffect(() => {
     setRes((prevState) => ({ ...prevState, gender: gender, age: age, height: height, weight: weight }));
   }, [gender, age, height, weight]); // 성별, 스테이터스가 props로 넘어올때마다(props.gender가 변동 있을때 마다)
 
-  const onClickSubmitButton = (e) => {// 입력버튼 누르면
+  const onClickSubmitButton = async (e) => {// 입력버튼 누르면
     e.preventDefault();
     setActivated(true);
+    const date = new Date();
+    // 날짜와 시간 정보를 가져오기
+    const year = date.getFullYear(); // 연도
+    const month = date.getMonth() + 1; // 월 (0부터 시작하므로 1을 더해줌)
+    const day = date.getDate(); // 일
+    const dayOfWeek = ["일요일","월요일","화요일","수요일","목요일","금요일","토요일"][date.getDay()];
+    const dateString = `${year}.${month}.${day} ${dayOfWeek}`;
+    const buttonType = e.target.id === "button1" ? 0 : 1;
+    const newRes = { ...res, buttonType, dateString };
+    setRes(newRes);
     if(e.target.id === 'button1'){ // 운동 추천
-      console.log("운동 추천")
-      // 현재 날짜를 가져오기 위해 Date 객체 생성
-      const date = new Date();
-      // 날짜와 시간 정보를 가져오기
-      const year = date.getFullYear(); // 연도
-      const month = date.getMonth() + 1; // 월 (0부터 시작하므로 1을 더해줌)
-      const day = date.getDate(); // 일
-      const dayOfWeek = ["일요일","월요일","화요일","수요일","목요일","금요일","토요일"][date.getDay()];
-      // 문자열 생성
-      const dateString = `${year}.${month}.${day} ${dayOfWeek}`;
-      const newRes = { ...res, buttonType: 0, dateString}
-      setRes(newRes)
-      // prompt 변수에 res값을 담아서 포스트요청(api/chat.ts로)
-      axios.post("/api/chat", { prompt:newRes }).then((res) => {
-        setData(res.data.response.replace(/^\n+/, "")); // chat.ts에서 응답받은 요청값을 data에 셋팅, 문장 맨 앞 줄바꿈 제거
-        setActivated(false);
-      });
-    }else if(e.target.id === 'button2'){ // 계획 반영
-      console.log("계획 반영")
-      const newRes = { ...res, buttonType: 1}
-      setRes(newRes)
-      axios.post("/api/chat", { prompt: newRes, data: data}).then((res) => {
-        const planJSON = JSON.parse(res.data.response.replace(/^\n+/, "")); // chat.ts에서 응답받은 요청값을 plan에 셋팅, 문장 맨 앞 줄바꿈 제거
-        console.log('planJSON',planJSON);
-        // 위 코드에서 변환된 JSON 객체를 서버로 전송하는 부분을 추가
-        request()
-          .post("/planner/exercise", { plan: planJSON })
-          .then((res) => {console.log("Plan sent to server:", res.data);}).catch((err) => {
+      const response = await axios.post("/api/chat", { prompt: newRes });
+      setData(response.data.response.replace(/^\n+/, ""));
+    }else if (e.target.id === 'button2') {
+      const dateString = `${year}-${month}-${day}`;
+      const response = await request().post("/planner/planCheck", { date: dateString, partition: "exercise" });
+      if (response.data.confirm === true) {
+        console.log("계획 반영");
+        try {
+          const res = await axios.post("/api/chat", { prompt: newRes, data: data });
+          const planJSON = JSON.parse(res.data.response.replace(/^\n+/, ""));
+          console.log('planJSON', planJSON);
+          await request().post("/planner/exercise", { plan: planJSON });
+          console.log("ExercisePlan sent to server");
+        } catch (err) {
           console.error(err);
-        });
-        setActivated(false);
-      });
+        }
+      } else if (response.data.confirm === false) {
+        alert("해당 날짜에 이미 계획이 있습니다.");
+      }
     }
+    setActivated(false);
   };
 
   const handleChange = (e) => {
@@ -94,7 +91,7 @@ const TrainingRecommend = ({ gender, age, height, weight }) => {
           </div>
           <div>
             <label className='flex items-center'>
-              <input type='radio' name='training' value='근력 운동' onChange={handleChange} />
+              <input type='radio' name='training' value='맨몸 근력 운동' onChange={handleChange} />
               <span className='ml-2'>무산소(웨이트)</span>
             </label>
           </div>
