@@ -16,6 +16,7 @@ const Profile = () => {
       .then((res) => {
         setProfileData(res.data.profile);
         setStatusData(res.data.status);
+        console.log(res.data);
       })
       .catch((err) => console.error(err));
   }, []);

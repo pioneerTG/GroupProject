@@ -21,7 +21,7 @@ export default async function chat(req: NextApiRequest, res: NextApiResponse) {
         if (disease !== "정보 없음") {
           promptText += ` ${disease}환자가 피해야 할 음식은 제외해주세요.`;
         }
-        promptText += ` 대답은 반드시 '년 월 일 (요일) 시간 별로: 밥(200kcal ,지방 1g,단백질 4g, 탄수화물 40g) + 닭가슴살 볶음(200kcal, 지방 8g, 단백질 16g, 탄수화물 4g)'와 같이 나타내며 ${dateString}을 기준으로 7일치 식단을 구성해주세요. 간식은 제외해주세요.`;
+        promptText += ` 대답은 반드시 '년 월 일 (요일) -시간 별로: 밥(200kcal ,지방 1g,단백질 4g, 탄수화물 40g) + 닭가슴살 볶음(200kcal, 지방 8g, 단백질 16g, 탄수화물 4g)'와 같이 나타내며 ${dateString}을 기준으로 7일치 식단을 구성해주세요. 간식은 제외해주세요.`;
         const response = await openai.createChatCompletion({
           model: "gpt-3.5-turbo",
           messages: [

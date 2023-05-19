@@ -13,10 +13,10 @@ const CreateTable = () => {
   const onClickSubmitButton = () => {
     if (title && category && content) {
       request()
-        .post("board/create", { title, category, content }) // 
+        .post("board/create", { title, category, content })
         .then((res) => {
           if (res.data.result) {
-            router.push("/board"); // 게시글 생성 성공하면 게시판으로 이동.
+            router.push("/board");
           } else {
             alert("실패했습니다.");
           }
