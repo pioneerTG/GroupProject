@@ -9,7 +9,7 @@ const RightSide = ({ age, height, weight, disease, allergy }) => {
     <div className='flex flex-col items-center justify-center w-full h-full overflow-auto font-bold text-black bg-white lg:flex-row dark:text-white dark:bg-gray-500 rounded-2xl shadow-shadow change'>
       <div className='flex w-full lg:w-[12%] h-full lg:flex-col justify-start'>
         <button
-          className={`flex w-full items-center justify-center h-1/2 text-xl p-5 hover:bg-hover dark:hover:bg-hover hover:transition ${
+          className={`flex w-full items-center justify-center h-1/3 text-xl p-5 hover:bg-hover dark:hover:bg-hover hover:transition ${
             show === "status" ? "bg-gray-400 dark:bg-gray-700" : "bg-gray-200 dark:bg-gray-500"
           }`}
           onClick={(e) => setShow("status")}
